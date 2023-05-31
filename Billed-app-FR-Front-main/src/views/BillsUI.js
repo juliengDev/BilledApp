@@ -5,6 +5,7 @@ import LoadingPage from "./LoadingPage.js"
 import Actions from './Actions.js'
 
 const row = (bill) => {
+  // console.log(bill)
   return (`
     <tr>
       <td>${bill.type}</td>
@@ -23,7 +24,7 @@ const row = (bill) => {
 const rows = (data) => {
   if (data && data.length) {    
     // Traitement qui permet de trier par ordre decroissant les donnees sur l'objet data
-    data.sort((a, b) => (Date.parse(a.date) > Date.parse(b.date) ? 1 : -1));
+    data.sort((a, b) => (Date.parse(a.date) > Date.parse(b.date) ? 1 : -1));    
   }
   return data && data.length ? data.map((bill) => row(bill)).join("") : "";
 };
