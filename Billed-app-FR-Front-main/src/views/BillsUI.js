@@ -19,9 +19,39 @@ const row = (bill) => {
     `)
   }
 
+//Si besoin de trier par ordre chronologique les notes de frais par date de creation :
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
-}
+  if (data && data.length) {    
+    // Traitement qui permet de trier par ordre decroissant les donnees sur l'objet data
+    data.sort((a, b) => (Date.parse(a.date) > Date.parse(b.date) ? 1 : -1));
+  }
+  return data && data.length ? data.map((bill) => row(bill)).join("") : "";
+};
+
+//Si besoin de trier par ordre chronologique les notes de frais par les dates :
+// function sortByDate(arr) {
+//   arr.sort((a, b) => {
+//     const months = {
+//       'Jan.': 0,
+//       'Fév.': 1,
+//       'Mar.': 2,
+//       'Avr.': 3,
+//       'Mai.': 4,
+//       'Juin.': 5,
+//       'Juil.': 6,
+//       'Aoû.': 7,
+//       'Sep.': 8,
+//       'Oct.': 9,
+//       'Nov.': 10,
+//       'Déc.': 11
+//     };
+//     const [dayA, monthA, yearA] = a.date.split(' ');
+//     const [dayB, monthB, yearB] = b.date.split(' ');
+//     const dateA = new Date(parseInt(yearA), months[monthA], parseInt(dayA));
+//     const dateB = new Date(parseInt(yearB), months[monthB], parseInt(dayB));
+//     return dateB - dateA;
+//   });
+// }
 
 export default ({ data: bills, loading, error }) => {
   
