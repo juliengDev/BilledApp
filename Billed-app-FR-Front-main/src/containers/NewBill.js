@@ -1,3 +1,4 @@
+
 import { ROUTES_PATH } from "../constants/routes.js";
 import Logout from "./Logout.js";
 
@@ -55,6 +56,7 @@ export default class NewBill {
         })
         .catch((error) => console.error(error));
     } else {      
+      e.preventDefault
       // On affiche a l'utilisateur les formats acceptees
       e.target.setCustomValidity("Formats acceptés : jpg, jpeg et png")
       e.target.reportValidity()
