@@ -244,12 +244,14 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
 describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
-      localStorage.setItem("user", JSON.stringify({ type: "Admin", email: "a@a" }));
+      
+      localStorage.setItem("user", JSON.stringify({ type: "Admin", email: "employee@test.tld" }));
       const root = document.createElement("div")
       root.setAttribute("id", "root")
       document.body.append(root)
       router()
       window.onNavigate(ROUTES_PATH.Dashboard)
+      
       await waitFor(() => screen.getByText("Validations"))
       const contentPending  = await screen.getByText("En attente (1)")
       expect(contentPending).toBeTruthy()

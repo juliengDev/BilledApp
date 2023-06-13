@@ -22,7 +22,8 @@ const row = (bill) => {
 
 //Si besoin de trier par ordre chronologique les notes de frais par date de creation :
 const rows = (data) => {
-  if (data && data.length) {    
+  if (data && data.length) {
+    console.log(data)    
     // Traitement qui permet de trier par ordre decroissant les donnees sur l'objet data
     data.sort((a, b) => (Date.parse(a.date) > Date.parse(b.date) ? 1 : -1));    
   }
