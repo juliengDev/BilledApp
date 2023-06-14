@@ -1,88 +1,175 @@
 /**
  * @jest-environment jsdom
  */
-
-import { screen } from "@testing-library/dom"
-import NewBillUI from "../views/NewBillUI.js"
-import NewBill from "../containers/NewBill.js"
-
+import "@testing-library/jest-dom";
+import NewBillUI from "../views/NewBillUI.js";
+import NewBill from "../containers/NewBill.js";
+import { localStorageMock } from "../__mocks__/localStorage.js";
+import { screen, waitFor, fireEvent } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
+import mockStore from "../__mocks__/store";
+import router from "../app/Router.js";
+import { ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES } from "../constants/routes.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
-    test("Then ...", () => {
-      const html = NewBillUI()
-      document.body.innerHTML = html
-      //to-do write assertion
-    })
-  })
+    //====================================================
+    beforeAll(() => {
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      window.onNavigate(ROUTES_PATH.NewBill);
+    });
 
-  describe("My Class", () => {
-    it("should correctly initialize instance properties", () => {
-      // containers/NewBill.js l6-8
-    })
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    //====================================================
 
-    it("should correctly assign the formNewBill property", () => {
-      // containers/NewBill.js 9
-    })
+    describe("The new bill form", () => {
+      describe("Input of a new bill form", () => {
+        it("'Service en ligne' from select menu should be renderer", async () => {
+          const inputSelectTest = screen.getByTestId("expense-type");
+          userEvent.selectOptions(inputSelectTest, ["Services en ligne"]);
+          await expect(inputSelectTest).toHaveValue("Services en ligne");
+        });
+      
+        it("Should store the text value in the name input", async () => {
+          const inputNameTest = screen.getByTestId("expense-name");
+          userEvent.type(inputNameTest, "Nouvelle facture test");
+          await expect(inputNameTest).toHaveValue("Nouvelle facture test");
+        });
+      
+        it("Should store the date value in the date input", async () => {
+          const inputDateTest = screen.getByTestId("datepicker");
+          userEvent.type(inputDateTest, "2023-06-17");
+          await expect(inputDateTest).toHaveValue("2023-06-17");
+        });
+      
+        it("Should store the chosen amount value in the amount input", async () => {
+          const inputAmountTest = screen.getByTestId("amount");
+          userEvent.type(inputAmountTest, "99");
+          await expect(inputAmountTest.value).toBe("99");
+        });
+      
+        it("Should store the chosen amount value in the VAT input", async () => {
+          const inputVATAmountTest = screen.getByTestId("vat");
+          userEvent.type(inputVATAmountTest, "40");
+          await expect(inputVATAmountTest.value).toBe("40");
+        });
+      
+        it("Should store the chosen amount value in the VAT Pourcentage input", async () => {
+          const inputVATPourcentageTest = screen.getByTestId("pct");
+          userEvent.type(inputVATPourcentageTest, "21");
+          await expect(inputVATPourcentageTest.value).toBe("21");
+        });
 
-    it("should add submit event listener to formNewBill", () => {
-       // containers/NewBill.js 12
-    })
+        it("Should store the typed text in the VAT commentary input", async () => {
+          const inputCommentaryTest = screen.getByTestId("commentary");
+          userEvent.type(inputCommentaryTest, "Ceci est un commentaire de test");
+          await expect(inputCommentaryTest).toHaveValue("Ceci est un commentaire de test");
+        });
+      })
 
-    it("should select 'file' input element", () => {
-       // containers/NewBill.js 13
-    })
+      it("should render a new bill form", async () => {
+        // document.body.innerHTML = NewBillUI();
+        const root = document.createElement("div");
+        root.setAttribute("id", "root");
+        document.body.append(root);
+        router();
+        window.onNavigate(ROUTES_PATH.NewBill);
+  
+        await waitFor(() => screen.getByTestId("form-new-bill"));
+        const newBillForm = screen.getByTestId("form-new-bill");
+  
+        expect(newBillForm).toBeTruthy();
+      });
+  
+      it("Should have a submit button on the page", () => {
+        document.body.innerHTML = NewBillUI();
+        const submitButton = document.getElementById("btn-send-bill");
+        expect(submitButton).toBeDefined();
+      });
+    });   
+  });
 
-    it("should add change event listener to file input", () => {
-      // containers/NewBill.js 14
-    })
 
-    it("should initialize fileUrl, fileName, and billId to null", () => {
-      // containers/NewBill.js 15-17
-    })
-
-    it("should create a new instance of Logout", () => {
-      // containers/NewBill.js 18
-    })    
-  })
 
   describe("handleChangeFile()", () => {
-
     it("should prevents default behavior", () => {
-      // containers/NewBill.js 21
-    })
+      document.body.innerHTML = NewBillUI();
+      let newBillTest;
+      const onNavigateTest = jest.fn();
+      const storeTest = {};
 
-    it("should gets 'file' from document", () => {
-       // containers/NewBill.js 22
-    })
+      newBillTest = new NewBill({
+        document,
+        onNavigate: onNavigateTest,
+        store: storeTest,
+        localStorage,
+      });
 
-    it("should logs 'file' to console", () => {
-      // containers/NewBill.js 24
-    })
+      const eventTest = {
+        preventDefault: jest.fn(),
+        target: {
+          value: "C:\\path\\to\\file.txt",
+          setCustomValidity: jest.fn(),
+          reportValidity: jest.fn(),
+        },
+      };
 
-    it("should splits file path", () => {
-       // containers/NewBill.js 25
-    })
+      newBillTest.handleChangeFile(eventTest);
 
-    it("should logs 'Raw filePath' to console", () => {
-      // containers/NewBill.js 26
-    })
+      expect(eventTest.preventDefault).toHaveBeenCalled();
+    });
 
-    it("should logs 'filePath after split' to console", () => {
-      // containers/NewBill.js 27
-    })
+    it("Should throw an error if the incorrect file format is attached", () => {
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      document.body.innerHTML = NewBillUI();
 
-    it("extracts file name", () => {
-       // containers/NewBill.js 28
-    })
+      let newBillTest;
+      const storeTest = {};
 
-    it("appends file and email to formData", () => {
-       // containers/NewBill.js 33-34
-    })
+      newBillTest = new NewBill({
+        document,
+        onNavigate,
+        store: storeTest,
+        localStorage: window.localStorage,
+      });
 
-    it("logs formData to console", () => {
-       // containers/NewBill.js 35
-    })
+      const handleChangeFileTest = jest.fn((e) => newBillTest.handleChangeFile);
+      const fileInputTest = screen.getByTestId("file");
 
-  })
-})
+      fileInputTest.addEventListener("change", handleChangeFileTest);
+      fireEvent.change(fileInputTest, {
+        target: {
+          files: [
+            new File(["test wrong file format"], "intro.txt", {
+              type: "text/txt",
+            }),
+          ],
+        },
+      });
+      expect(handleChangeFileTest).toHaveBeenCalled();
+    });
+  });
+});

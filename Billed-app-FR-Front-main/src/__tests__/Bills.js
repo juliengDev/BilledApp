@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { ROUTES } from "../constants/routes";
+// import { ROUTES } from "../constants/routes";
 import { ROUTES_PATH } from "../constants/routes.js";
 import "bootstrap";
 import "@testing-library/jest-dom";
@@ -19,6 +19,8 @@ jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
+    
+    //====================================================
     beforeAll(() => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
@@ -39,6 +41,7 @@ describe("Given I am connected as an employee", () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
+    //====================================================
 
     it("Should highlight the Bill icon in the vertical layout", async () => {
       const root = document.createElement("div");
@@ -198,8 +201,6 @@ describe("Given I am connected as an employee", () => {
       });
     });
 
-
-
     // ============================================================
 
     describe("When the page is loading", () => {
@@ -208,6 +209,13 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getAllByText("Loading...")).toBeTruthy();
       });
     });
+
+    describe('When I am on Bills page but back-end send an error message', () => {
+      test('Then, Error page should be rendered', () => {
+        document.body.innerHTML = BillsUI({ error: 'some error message' })
+        expect(screen.getAllByText('Erreur')).toBeTruthy()
+      })
+    })
 
     xdescribe("handleClickIconEye()", () => {
       it("should retrieve the data-bill-url attribute from the icon element", () => {
@@ -283,7 +291,7 @@ describe("Given I am connected as an employee", () => {
   });
 });
 
-    // ============================================================
+// ============================================================
 
 // test d'intégration GET
 
@@ -354,5 +362,7 @@ describe("When I navigate to Bills", () => {
       const message = await screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
     });
+
+   
   });
 });
