@@ -215,80 +215,8 @@ describe("Given I am connected as an employee", () => {
         document.body.innerHTML = BillsUI({ error: 'some error message' })
         expect(screen.getAllByText('Erreur')).toBeTruthy()
       })
-    })
-
-    xdescribe("handleClickIconEye()", () => {
-      it("should retrieve the data-bill-url attribute from the icon element", () => {
-        // /src/containers/Bills.js l24
-        // expect(votreVariable).toHaveAttribute('data-bill-url');
-      });
-
-      it("should calculate the image width based on #modaleFile width", () => {
-        // /src/containers/Bills.js l25
-        /*        
-          Appeler l'extrait de code et stocker la valeur imgWidth résultante
-          const imgWidth = Math.floor($('#modaleFile').width() * 0.5);
-  
-          Vérifier que la largeur de l'image (imgWidth) est calculée correctement
-          expect(imgWidth).toEqual(960);
-          */
-      });
-
-      it("should set the modal with the correct HTML element", () => {
-        // /src/container.Bills.js l26
-        // expect(modalBodyContent).toEqual(expectedHTML);
-      });
-
-      it("should set the <div> HTML element with the right class and attribute", () => {
-        // /src/containers/Bills.js l26
-        // expect(generatedDiv.hasClass('bill-proof-container')).toBeTruthy();
-        // expect(generatedDiv.css('text-align')).toEqual('center');
-      });
-
-      it("should set the <img> HTML element with the rigth attribute", () => {
-        // /src/container.Bills.js l26
-        /*
-          expect(generatedImg.attr('width')).toEqual(String(imgWidth));
-          expect(generatedImg.attr('src')).toEqual(billUrl);
-          expect(generatedImg.attr('alt')).toEqual('Bill');
-          */
-      });
-
-      it("should find the element define with #modaleFile or .modal-body ", () => {
-        // /src/container.Bills.js l26
-        /* 
-            expect(modalBodyContent).toBeNull();
-            expect(generatedDiv.length).toBe(0);
-          */
-      });
-    });
-
-    xit("should add event listener to buttonNewBill", () => {
-      // /src/containers/Bills.js l11
-      // Testing pattern :
-      // Arrange : Define the testing environnement & values
-      // Act : Run actual code / function that should be tested
-      // Assert : Evaluate the produced value / result and compage it to the expected value / result
-    });
-
-    xit("should add event listeners to iconEye elements", () => {
-      // /src/containers/Bills.js l13
-    });
-
-    xit("should call handleClickIconEye when iconEye is clicked", () => {});
-  });
-
-  xdescribe("Others", () => {
-    describe("When click on new bill button", () => {
-      it("Should open a NewBill page", () => {
-        // /src/containers/Bills.js l20
-      });
-    });
-
-    xdescribe("When click on an Eye icon", () => {
-      it("should open a new Bill modal", () => {});
-    });
-  });
+    })   
+  });  
 });
 
 // ============================================================
