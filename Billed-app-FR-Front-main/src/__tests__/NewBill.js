@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import mockStore from "../__mocks__/store";
 import router from "../app/Router.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import BillsUI from "../views/BillsUI.js"
 
 jest.mock("../app/store", () => mockStore);
 
@@ -186,3 +187,124 @@ describe("When I am on NewBill Page", () => {
 });
 
 // test d'intégration POST
+describe("Given I am a user connected as en Employee", () => {
+  describe("When a valid bill is submit", () => {
+    it("Should trown the bill to the back end", async () => {
+      document.body.innerHTML = NewBillUI();
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+        );
+        
+        const newBillTest = new NewBill({
+          document,
+          onNavigate,
+          store: null,
+          localStorage: window.localStorage,
+        });
+        
+      const billTest = {
+        id: "47qAXxdfIm4zOKkLzMro",
+        vat: 12,
+        fileUrl: "https://test.storage.tld/v0/b/billable-677b6.a…61.jpeg?alt=media&token=7685cd61-c112-42bc-9929-8a799bb82d8b",
+        status: "pending",
+        type: "Hôtel et logement",
+        commentary: "Hotel de la plage",
+        name: "test",
+        date: "2023-06-15",
+        amount: 150,
+        fileName: "testing",
+        email: "employee@test.tld",
+        pct: 25,
+      };
+      
+      //click submit
+      const submit = screen.queryByTestId("form-new-bill");
+      const handleSubmit = jest.fn((e) => newBillTest.handleSubmit(e));
+
+      //apply to the DOM
+      document.querySelector(`select[data-testid="expense-type"]`).value =
+        billTest.type;
+      document.querySelector(`input[data-testid="expense-name"]`).value =
+        billTest.name;
+      document.querySelector(`input[data-testid="datepicker"]`).value =
+        billTest.date;
+      document.querySelector(`input[data-testid="amount"]`).value =
+        billTest.amount;
+      document.querySelector(`input[data-testid="vat"]`).value = billTest.vat;
+      document.querySelector(`input[data-testid="pct"]`).value = billTest.pct;
+      document.querySelector(`textarea[data-testid="commentary"]`).value =
+        billTest.commentary;
+      newBillTest.fileUrl = billTest.fileUrl;
+      newBillTest.fileName = billTest.fileName;
+      newBillTest.id = billTest.id;
+
+      submit.addEventListener("click", handleSubmit);
+
+      fireEvent.click(submit);
+
+      //verify if handleSubmit was called
+      expect(handleSubmit).toHaveBeenCalled();
+    });    
+  });
+  describe("When an error occurs on API", () => {
+    beforeEach(() => {
+      jest.spyOn(mockStore, "bills");
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+          email: "employee@test.tld",
+        })
+      );
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.appendChild(root);
+      router();
+    });
+
+    test("fetches bills from an API and fails with 404 message error", async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error("Erreur 404"));
+          },
+        };
+      });
+      document.body.innerHTML = BillsUI({ error: "Erreur 404" })
+      const message = await screen.getByText(/Erreur 404/);
+      expect(message).toBeTruthy();
+    });
+
+    test("fetches messages from an API and fails with 500 message error", async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error("Erreur 500"));
+          },
+        };
+      });
+
+      document.body.innerHTML = BillsUI({ error: "Erreur 500" })
+      const message = await screen.getByText(/Erreur 500/);
+      expect(message).toBeTruthy();
+    });
+
+    
+
+   
+  });
+});
