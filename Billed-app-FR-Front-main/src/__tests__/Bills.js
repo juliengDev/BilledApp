@@ -3,53 +3,49 @@
  */
 
 // import { ROUTES } from "../constants/routes";
-import { ROUTES_PATH } from "../constants/routes.js";
 import "bootstrap";
 import "@testing-library/jest-dom";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { screen, waitFor } from "@testing-library/dom";
 import { bills } from "../fixtures/bills.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import mockStore from "../__mocks__/store";
 import userEvent from "@testing-library/user-event";
 import BillsUI from "../views/BillsUI.js";
 import Bills from "../containers/Bills";
+import mockStore from "../__mocks__/store";
 import router from "../app/Router.js";
 
 jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
+  beforeAll(() => {
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "employee@test.tld",
+        status: "connected",
+      })
+    );
+
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    router();
+    window.onNavigate(ROUTES_PATH.Bills);
+
+    document.body.innerHTML = BillsUI({ data: bills });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe("When I am on Bills Page", () => {
-    
-    //====================================================
-    beforeAll(() => {
-      Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
-      });
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Employee",
-        })
-      );
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-    //====================================================
-
     it("Should highlight the Bill icon in the vertical layout", async () => {
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-
       await waitFor(() => screen.getByTestId("icon-window"));
       const windowIcon = screen.getByTestId("icon-window");
 
@@ -57,12 +53,6 @@ describe("Given I am connected as an employee", () => {
     });
 
     it("Should render the Mail icon", async () => {
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-
       await waitFor(() => screen.getByTestId("icon-mail"));
       const windowIcon = screen.getByTestId("icon-mail");
 
@@ -70,12 +60,6 @@ describe("Given I am connected as an employee", () => {
     });
 
     it("Should render the New Bill button", async () => {
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-
       await waitFor(() => screen.getByTestId("btn-new-bill"));
       const newBillButton = screen.getByTestId("btn-new-bill");
 
@@ -83,12 +67,6 @@ describe("Given I am connected as an employee", () => {
     });
 
     it("Should render the list of all Bills", async () => {
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-
       await waitFor(() => screen.getByTestId("tbody"));
       const billsTableBody = screen.getByTestId("tbody");
 
@@ -110,40 +88,29 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("My class Bills", () => {
+    document.body.innerHTML = BillsUI({ data: bills });
+
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+
+    let billTest = new Bills({
+      document,
+      onNavigate,
+      store: mockStore,
+      localStorage: window.localStorage,
+    });
+
     it("should assign the properties object correctly", () => {
-      document.body.innerHTML = BillsUI({ data: bills });
-      let billTest;
-      const onNavigateTest = jest.fn();
-      const storeTest = {};
-
-      billTest = new Bills({
-        document,
-        onNavigate: onNavigateTest,
-        store: {},
-        localStorage,
-      });
-
       expect(billTest.document).toEqual(document);
-      expect(billTest.onNavigate).toEqual(onNavigateTest);
-      expect(billTest.store).toEqual(storeTest);
+      expect(billTest.onNavigate).toEqual(onNavigate);
+      expect(billTest.store).toEqual(mockStore);
+      expect(billTest.localStorage).toBe(undefined);
     });
 
     it("should call handleClickNewBill when buttonNewBill is clicked", () => {
-      document.body.innerHTML = BillsUI({ data: bills });
-
-      let buttonNewBillTest;
-      let handleClickNewBillTest;
-      let billTest;
-
-      billTest = new Bills({
-        document,
-        onNavigate: jest.fn(),
-        store: {},
-        localStorage: {},
-      });
-
-      handleClickNewBillTest = jest.fn();
-      buttonNewBillTest = document.querySelector(
+      let handleClickNewBillTest = jest.fn(() => billTest.handleClickNewBill);
+      let buttonNewBillTest = document.querySelector(
         `button[data-testid="btn-new-bill"]`
       );
       if (buttonNewBillTest)
@@ -183,12 +150,9 @@ describe("Given I am connected as an employee", () => {
 
     describe("handleClickNewBill()", () => {
       it("should call onNavigate with the NewBill route path", () => {
-        document.body.innerHTML = BillsUI({ data: bills });
-        let billTest;
-
-        billTest = new Bills({
+        let billTest = new Bills({
           document: document,
-          onNavigate: jest.fn(),
+          onNavigate,
           store: {},
           localStorage: {},
         });
@@ -201,8 +165,6 @@ describe("Given I am connected as an employee", () => {
       });
     });
 
-    // ============================================================
-
     describe("When the page is loading", () => {
       it("Should rend the Loading page", () => {
         document.body.innerHTML = BillsUI({ loading: true });
@@ -210,16 +172,14 @@ describe("Given I am connected as an employee", () => {
       });
     });
 
-    describe('When I am on Bills page but back-end send an error message', () => {
-      test('Then, Error page should be rendered', () => {
-        document.body.innerHTML = BillsUI({ error: 'some error message' })
-        expect(screen.getAllByText('Erreur')).toBeTruthy()
-      })
-    })   
-  });  
+    describe("When I am on Bills page but back-end send an error message", () => {
+      test("Then, Error page should be rendered", () => {
+        document.body.innerHTML = BillsUI({ error: "some error message" });
+        expect(screen.getAllByText("Erreur")).toBeTruthy();
+      });
+    });
+  });
 });
-
-// ============================================================
 
 // test d'intégration GET
 
@@ -290,7 +250,5 @@ describe("When I navigate to Bills", () => {
       const message = await screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
     });
-
-   
   });
 });
