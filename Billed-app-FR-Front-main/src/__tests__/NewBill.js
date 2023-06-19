@@ -5,11 +5,12 @@ import "@testing-library/jest-dom";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import { screen, waitFor, fireEvent } from "@testing-library/dom";
+import { billTest } from "../__mocks__/bill.js";
+import mockStore from "../__mocks__/store";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import BillsUI from "../views/BillsUI.js";
 import userEvent from "@testing-library/user-event";
-import mockStore from "../__mocks__/store";
 import router from "../app/Router.js";
 
 jest.mock("../app/store", () => mockStore);
@@ -198,21 +199,8 @@ describe("Given I am a user connected as en Employee", () => {
         localStorage: window.localStorage,
       });
 
-      const billTest = {
-        id: "47qAXxdfIm4zOKkLzMro",
-        vat: 12,
-        fileUrl:
-          "https://test.storage.tld/v0/b/billable-677b6.a…61.jpeg?alt=media&token=7685cd61-c112-42bc-9929-8a799bb82d8b",
-        status: "pending",
-        type: "Hôtel et logement",
-        commentary: "Hotel de la plage",
-        name: "test",
-        date: "2023-06-15",
-        amount: 150,
-        fileName: "testing",
-        email: "employee@test.tld",
-        pct: 25,
-      };
+      // importer cet objet depuis un fichier dedier depuis le repertoire __mocks__/bill.js
+      
 
       //click submit
       const submit = screen.queryByTestId("form-new-bill");

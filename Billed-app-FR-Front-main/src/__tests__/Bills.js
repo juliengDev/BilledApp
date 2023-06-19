@@ -88,18 +88,25 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("My class Bills", () => {
-    document.body.innerHTML = BillsUI({ data: bills });
 
-    const onNavigate = (pathname) => {
-      document.body.innerHTML = ROUTES({ pathname });
-    };
+    let billTest
+    let onNavigate
+    beforeAll(() => {
+      onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
 
-    let billTest = new Bills({
-      document,
-      onNavigate,
-      store: mockStore,
-      localStorage: window.localStorage,
-    });
+      billTest = new Bills({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      });
+    })
+
+    beforeEach(() => {
+      document.body.innerHTML = BillsUI({ data: bills });
+    })
 
     it("should assign the properties object correctly", () => {
       expect(billTest.document).toEqual(document);
@@ -121,19 +128,16 @@ describe("Given I am connected as an employee", () => {
 
     it("should call handleClickIconEye for each iconEye element", () => {
       document.body.innerHTML = BillsUI({ data: bills });
-
+      
       let iconEyeTest;
-      let billTest;
-      let handleClickIconEyeTest;
-
-      billTest = new Bills({
+      let handleClickIconEyeTest;      
+      handleClickIconEyeTest = jest.fn();
+       billTest = new Bills({
         document,
         onNavigate: jest.fn(),
         store: {},
         localStorage: {},
       });
-
-      handleClickIconEyeTest = jest.fn();
 
       iconEyeTest = document.querySelectorAll(`div[data-testid="icon-eye"]`);
 
@@ -150,12 +154,7 @@ describe("Given I am connected as an employee", () => {
 
     describe("handleClickNewBill()", () => {
       it("should call onNavigate with the NewBill route path", () => {
-        let billTest = new Bills({
-          document: document,
-          onNavigate,
-          store: {},
-          localStorage: {},
-        });
+        
         billTest.onNavigate = jest.fn();
         billTest.handleClickNewBill();
 
